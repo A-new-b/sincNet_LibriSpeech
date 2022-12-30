@@ -1,0 +1,8 @@
+# .gitignore
+data_split/Libri/dataset
+data_split/Libri/result_noise_set
+data_split/Libri/result_set
+data_split/Librispeech_spkid_sel
+__pycache__/
+.vscode
+exp/SincNet_Libri/
