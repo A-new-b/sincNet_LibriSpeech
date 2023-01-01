@@ -131,9 +131,7 @@ try:
 except:
     os.mkdir(output_folder)
 
-# log
 
-log = open("log.txt", "w")
 # setting seed
 torch.manual_seed(seed)
 np.random.seed(seed)
@@ -200,7 +198,7 @@ if pt_file != 'none':
     DNN1_net.load_state_dict(checkpoint_load['DNN1_model_par'])
     DNN2_net.load_state_dict(checkpoint_load['DNN2_model_par'])
 
-mode = "test"
+mode = "train"
 if mode == "train":
 
   optimizer_CNN = optim.RMSprop(CNN_net.parameters(), lr=lr, alpha=0.95, eps=1e-8)
@@ -242,7 +240,7 @@ if mode == "train":
     err_tot = err_sum / N_batches
 
     # Full Validation  new  
-    if False:
+    if True:
 
         CNN_net.eval()
         DNN1_net.eval()
@@ -307,30 +305,31 @@ if mode == "train":
         mesg = "epoch %i, loss_tr=%f err_tr=%f loss_te=%f err_te=%f err_te_snt=%f" % (
         epoch, loss_tot, err_tot, loss_tot_dev, err_tot_dev, err_tot_dev_snt)
         print(mesg)
-        log.write(mesg + "\n")
 
         with open(output_folder + "/res.res", "a") as res_file:
             res_file.write("epoch %i, loss_tr=%f err_tr=%f loss_te=%f err_te=%f err_te_snt=%f\n" % (
             epoch, loss_tot, err_tot, loss_tot_dev, err_tot_dev, err_tot_dev_snt))
+        
+        checkpoint = {'CNN_model_par': CNN_net.state_dict(),
+                            'DNN1_model_par': DNN1_net.state_dict(),
+                            'DNN2_model_par': DNN2_net.state_dict(),
+                            }
+        torch.save(checkpoint, output_folder + '/model_raw.pkl')
+        print("save to "+ output_folder + '/model_raw.pkl')
 
         
 
     else:
-        mesg = "epoch %i, loss_tr=%f err_tr=%f" % (epoch, loss_tot, err_tot)
+        mesg = "epoch %i, loss_tr=%f err_tr=%f \n" % (epoch, loss_tot, err_tot)
         print(mesg)
-        log.write(mesg + "\n")
-    if epoch == 100:
-      checkpoint = {'CNN_model_par': CNN_net.state_dict(),
-                          'DNN1_model_par': DNN1_net.state_dict(),
-                          'DNN2_model_par': DNN2_net.state_dict(),
-                          }
-      torch.save(checkpoint, output_folder + '/model_raw.pkl')
-  checkpoint = {'CNN_model_par': CNN_net.state_dict(),
-                          'DNN1_model_par': DNN1_net.state_dict(),
-                          'DNN2_model_par': DNN2_net.state_dict(),
-                          }
-  torch.save(checkpoint, output_folder + '/model_raw.pkl')
-  print("save to "+ output_folder + '/model_raw.pkl')
+        with open(output_folder + "/res.res", "a") as res_file:
+            res_file.write(mesg)        
+    checkpoint = {'CNN_model_par': CNN_net.state_dict(),
+                            'DNN1_model_par': DNN1_net.state_dict(),
+                            'DNN2_model_par': DNN2_net.state_dict(),
+                            }
+    torch.save(checkpoint, output_folder + '/model_raw.pkl')
+    print("save to "+ output_folder + '/model_raw.pkl')
 
 if mode == "test":
   CNN_net.eval()
